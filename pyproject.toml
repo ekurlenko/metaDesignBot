@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "metadesignbot"
+version = "0.1.0"
+description = ""
+authors = ["Egor <ekurlenko17@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+aiogram = "3.4.1"
+peewee = "3.16.2"
+peewee-async = "^0.10.0"
+python-dotenv = "^1.0.1"
+aiomysql = "^0.2.0"
+redis = "^5.0.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
