@@ -11,13 +11,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
-async def main():
-    logging.basicConfig(
+logging.basicConfig(
         level=logging.INFO,
+        filename="bot.log",
         format="%(asctime)s - [%(levelname)s] -  %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
     )
 
+
+async def main():
     bot = Bot(token=os.getenv('TOKEN'))
     dp = Dispatcher(storage=RedisStorage.from_url(os.getenv('REDIS_URL')))
     dp.include_router(orderConstructor.router)
