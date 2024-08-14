@@ -54,7 +54,7 @@ async def square(message: Message, state: FSMContext):
                 OrderConfigure.room_type)
 async def room_type(message: Message, state: FSMContext):
     try:
-        room_square = float(message.text.replace(',', '.').replace(' ', ''))
+        room_square = abs(float(message.text.replace(',', '.').replace(' ', '')))
         if room_square % 1 == 0:
             room_square = int(room_square)
         await state.update_data(square=room_square)
@@ -113,6 +113,7 @@ async def confirm(message: Message, state: FSMContext):
     #
 
     await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Заказ_{order.id}\n"
+                                                                  f"#{data.get('name')}_{data.get('phone')}\n"
                                                                   f"Тип недвижимости: {data.get('property_type')}\n"
                                                                   f"Площадь помещения: {data.get('square')}\n"
                                                                   f"Тип помещения: {data.get('room_type')}\n"
