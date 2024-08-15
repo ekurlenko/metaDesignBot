@@ -79,57 +79,63 @@ async def repair_class(message: Message, state: FSMContext):
                 OrderConfigure.phone)
 async def phone(message: Message, state: FSMContext):
     await state.update_data(repair_class=message.text)
-    await message.answer("Ваш расчет готов! На какой номер телефона в Telegram выслать стоимость?\n"
-                         "Например: 79991807777\n"
-                         "Или нажмите на кнопку ниже.",
+    await message.answer("Ваш расчет готов! Нажмите кнопку ниже, чтобы увидеть результат\n",
                          reply_markup=get_phone_keyboard())
     await state.set_state(OrderConfigure.confirm)
 
 
 @router.message(OrderConfigure.confirm)
 async def confirm(message: Message, state: FSMContext):
-    await state.update_data(phone=phone_parse(message.text) if message.contact is None
-    else phone_parse(message.contact.phone_number))
+    if message.contact is not None:
+        await state.update_data(phone=phone_parse(message.contact.phone_number))
+        data = await state.get_data()
+        #
+        try:
+            user = await UserModel.aio_create(chat_id=data.get('chat_id'),
+                                              first_name=data.get('name'),
+                                              phone_number=data.get('phone'))
+        except peewee.IntegrityError:
+            user = await UserModel.aio_get(UserModel.chat_id == data.get('chat_id'))
 
-    data = await state.get_data()
-    #
-    try:
-        user = await UserModel.aio_create(chat_id=data.get('chat_id'),
-                                          first_name=data.get('name'),
-                                          phone_number=data.get('phone'))
-    except peewee.IntegrityError:
-        user = await UserModel.aio_get(UserModel.chat_id == data.get('chat_id'))
+        property_type = await PropertyTypeModel.aio_get(PropertyTypeModel.name == data.get('property_type'))
+        room_type = await RoomTypeModel.aio_get(RoomTypeModel.name == data.get('room_type'))
+        repair_class = await RepairClassModel.aio_get(RepairClassModel.name == data.get('repair_class'))
 
-    property_type = await PropertyTypeModel.aio_get(PropertyTypeModel.name == data.get('property_type'))
-    room_type = await RoomTypeModel.aio_get(RoomTypeModel.name == data.get('room_type'))
-    repair_class = await RepairClassModel.aio_get(RepairClassModel.name == data.get('repair_class'))
+        order = await OrderModel.aio_create(user_id=user,
+                                            property_type=property_type,
+                                            square=float(data.get('square')),
+                                            room_type=room_type,
+                                            repair_class=repair_class,
+                                            cost=cost_calculator(data))
+        #
 
-    order = await OrderModel.aio_create(user_id=user,
-                                        property_type=property_type,
-                                        square=float(data.get('square')),
-                                        room_type=room_type,
-                                        repair_class=repair_class,
-                                        cost=cost_calculator(data))
-    #
+        await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Заказ_{order.id}\n"
+                                                                      f"#Клиент_{data.get('phone')}\n"
+                                                                      f"Тип недвижимости: {data.get('property_type')}\n"
+                                                                      f"Площадь помещения: {data.get('square')}\n"
+                                                                      f"Тип помещения: {data.get('room_type')}\n"
+                                                                      f"Класс ремонта: {data.get('repair_class')}\n"
+                                                                      f"Номер телефона для связи: +7{data.get('phone')}\n"
+                                                                      f"Стоимость ремонта: от {int(cost_calculator(data)):,} руб.\n"
+                                                                      f"@{data.get('user')}")
 
-    await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Заказ_{order.id}\n"
-                                                                  f"#{data.get('name')}_{data.get('phone')}\n"
-                                                                  f"Тип недвижимости: {data.get('property_type')}\n"
-                                                                  f"Площадь помещения: {data.get('square')}\n"
-                                                                  f"Тип помещения: {data.get('room_type')}\n"
-                                                                  f"Класс ремонта: {data.get('repair_class')}\n"
-                                                                  f"Номер телефона для связи: +7{data.get('phone')}\n"
-                                                                  f"Стоимость ремонта: от {cost_calculator(data)} руб.\n"
-                                                                  f"@{data.get('user')}")
-
-    await message.answer(f"Тип недвижимости: {data.get('property_type')}\n"
-                         f"Площадь помещения: {data.get('square')}\n"
-                         f"Тип помещения: {data.get('room_type')}\n"
-                         f"Класс ремонта: {data.get('repair_class')}\n"
-                         f"Номер телефона для связи: +7{data.get('phone')}\n"
-                         f"Стоимость ремонта: от {cost_calculator(data)} руб.")
-
-    await message.answer("Заявка отправлена! Ожидайте обратную связь)\n"
-                         "Если хотите оставить еще одну заявку, нажмите кнопку ниже",
-                         reply_markup=create_order_keyboard())
-    await state.clear()
+        await message.answer(f"Тип недвижимости: {data.get('property_type')}\n"
+                             f"Площадь помещения: {data.get('square')}\n"
+                             f"Тип помещения: {data.get('room_type')}\n"
+                             f"Класс ремонта: {data.get('repair_class')}\n"
+                             f"Номер телефона для связи: +7{data.get('phone')}\n"
+                             f"Стоимость ремонта: от {int(cost_calculator(data)):,} руб.")
+        if data.get('property_type') == FLAT:
+            await message.answer("Заявка отправлена! Ожидайте обратную связь)\n"
+                                 "Если хотите оставить еще одну заявку, нажмите кнопку ниже",
+                                 reply_markup=create_order_keyboard())
+        else:
+            await message.answer("Заявка отправлена! "
+                                 "Расчет по ремонту в выбранном типе недвижимости "
+                                 "осуществляется в индивидуальном порядке."
+                                 " Мы с Вами свяжемся в течение 15 минут.")
+        await state.clear()
+    else:
+        await message.answer("Ваш расчет готов! Нажмите кнопку ниже, чтобы увидеть результат\n",
+                             reply_markup=get_phone_keyboard())
+        await state.set_state(OrderConfigure.confirm)
