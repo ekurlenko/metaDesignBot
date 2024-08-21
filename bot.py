@@ -5,7 +5,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 
-from handlers import orderConstructor
+from handlers import orderConstructor, start
 
 from dotenv import load_dotenv
 
@@ -16,14 +16,15 @@ logging.basicConfig(
         filename="bot.log",
         format="%(asctime)s - [%(levelname)s] -  %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
     )
+bot = Bot(token=os.getenv('TOKEN'))
 
 
-async def main():
-    bot = Bot(token=os.getenv('TOKEN'))
+async def main(bot: Bot):
+
     dp = Dispatcher(storage=RedisStorage.from_url(os.getenv('REDIS_URL')))
-    dp.include_router(orderConstructor.router)
+    dp.include_router(start.router)
     await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main(bot))
