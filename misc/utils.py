@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from misc.consts import COMFORT, BUSINESS
+from misc.consts import COMFORT, BUSINESS, SECONDARY
 
 
 def phone_parse(x) -> str:
@@ -16,34 +16,42 @@ def phone_parse(x) -> str:
 def cost_calculator(data: Dict[str, Any]) -> int:
     square = data.get('square')
     repair_class = data.get('repair_class')
+    property_type = data.get('property_type')
+
+    if property_type == SECONDARY:
+        cost = 150 * 1000
+    else:
+        cost = 0
 
     if square < 25:
         if repair_class == COMFORT:
-            return 120 * 1000 * square
+            cost += 120 * 1000 * square
         elif repair_class == BUSINESS:
-            return 170 * 1000 * square
+            cost += 170 * 1000 * square
     elif square < 30:
         if repair_class == COMFORT:
-            return 110 * 1000 * square
+            cost += 110 * 1000 * square
         elif repair_class == BUSINESS:
-            return 160 * 1000 * square
+            cost += 160 * 1000 * square
     elif square < 65:
         if repair_class == COMFORT:
-            return 100 * 1000 * square
+            cost += 100 * 1000 * square
         elif repair_class == BUSINESS:
-            return 150 * 1000 * square
+            cost += 150 * 1000 * square
     elif square < 95:
         if repair_class == COMFORT:
-            return 95 * 1000 * square
+            cost += 95 * 1000 * square
         elif repair_class == BUSINESS:
-            return 130 * 1000 * square
+            cost += 130 * 1000 * square
     elif square < 100:
         if repair_class == COMFORT:
-            return 90 * 1000 * square
+            cost += 90 * 1000 * square
         elif repair_class == BUSINESS:
-            return 120 * 1000 * square
+            cost += 120 * 1000 * square
     else:
         if repair_class == COMFORT:
-            return 85 * 1000 * square
+            cost += 85 * 1000 * square
         elif repair_class == BUSINESS:
-            return 150 * 1000 * square
+            cost += 150 * 1000 * square
+
+    return int(cost)
