@@ -2,8 +2,10 @@ import peewee
 import os
 
 from aiogram import Router, F
-from aiogram.types import Message
+from aiogram.types import Message, FSInputFile
+from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
+from aiogram.utils.media_group import MediaGroupBuilder
 
 from keyboards.phoneKeyboard import get_phone_keyboard
 from keyboards.roomTypeKeyboard import room_type_keyboard
@@ -19,9 +21,10 @@ from dataBase.models.RoomTypeModel import RoomTypeModel
 from dataBase.models.PropertyTypesModel import PropertyTypeModel
 from dataBase.models.RepairClassesModel import RepairClassModel
 
-from bot import bot
+from handlers import bot
 
 from misc.consts import *
+from misc.files import get_photo_from_dir
 from misc.utils import phone_parse, cost_calculator
 
 router = Router()
@@ -70,10 +73,25 @@ async def repair_class(message: Message, state: FSMContext):
 
 @router.message(OrderConfigure.phone)
 async def phone(message: Message, state: FSMContext):
-    await state.update_data(repair_class=message.text)
-    await message.answer("Ваш расчет готов! Нажмите на кнопку ниже, чтобы увидеть результат\n",
-                         reply_markup=get_phone_keyboard())
-    await state.set_state(OrderConfigure.confirm)
+    if message.text == "Подробнее о категориях ремонта":
+        media = MediaGroupBuilder(caption=FIRST_ABOUT_CATEGORIES)
+
+        for file in get_photo_from_dir("section2"):
+            ph = FSInputFile(os.path.abspath(file))
+            media.add_photo(media=ph)
+
+        await bot.send_media_group(message.chat.id, media=media.build(), )
+
+        await message.answer(text=SECOND_ABOUT_CATEGORIES,
+                             parse_mode=ParseMode.HTML)
+        await message.answer("Какая категория ремонта вам ближе?",
+                             reply_markup=repair_class_keyboard())
+        await state.set_state(OrderConfigure.phone)
+    else:
+        await state.update_data(repair_class=message.text)
+        await message.answer("Ваш расчет готов! Нажмите на кнопку ниже, чтобы увидеть результат\n",
+                             reply_markup=get_phone_keyboard())
+        await state.set_state(OrderConfigure.confirm)
 
 
 @router.message(OrderConfigure.confirm)
