@@ -1,14 +1,13 @@
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from aiogram.types import ReplyKeyboardMarkup
 
-from misc.consts import COMFORT, BUSINESS, ABOUT_CATEGORIES
+from misc.consts import GO_BACK, CALCULATE_COST
 
 
-def repair_class_keyboard() -> ReplyKeyboardMarkup:
+def calculate_or_menu_keyboard() -> ReplyKeyboardMarkup:
     keyboard = ReplyKeyboardBuilder()
-    keyboard.button(text=COMFORT)
-    keyboard.button(text=BUSINESS)
-    keyboard.button(text="Подробнее о категориях ремонта")
+    keyboard.button(text=CALCULATE_COST)
+    keyboard.button(text=GO_BACK)
     keyboard.adjust(2)
     return keyboard.as_markup(resize_keyboard=True,
                               one_time_keyboard=True)
