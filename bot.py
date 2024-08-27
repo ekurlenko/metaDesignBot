@@ -5,7 +5,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 
-from handlers import orderConstructor, start
+from handlers import orderConstructor, start, repairCategories, moreInfo, designProject, aboutUs
 
 from dotenv import load_dotenv
 
@@ -22,7 +22,8 @@ bot = Bot(token=os.getenv('TOKEN'))
 async def main(bot: Bot):
 
     dp = Dispatcher(storage=RedisStorage.from_url(os.getenv('REDIS_URL')))
-    dp.include_router(start.router)
+    dp.include_routers(start.router, orderConstructor.router, repairCategories.router, moreInfo.router,
+                       designProject.router, aboutUs.router)
     await dp.start_polling(bot)
 
 
