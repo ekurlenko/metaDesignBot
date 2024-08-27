@@ -16,12 +16,11 @@ def phone_parse(x) -> str:
 def cost_calculator(data: Dict[str, Any]) -> int:
     square = data.get('square')
     repair_class = data.get('repair_class')
-    property_type = data.get('property_type')
+    room_type = data.get('room_type')
 
-    if property_type == SECONDARY:
-        cost = 150 * 1000
-    else:
-        cost = 0
+    cost = 0
+    if room_type == SECONDARY:
+        cost += 150 * 1000
 
     if square < 25:
         if repair_class == COMFORT:
