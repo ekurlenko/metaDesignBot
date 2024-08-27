@@ -6,12 +6,12 @@ from aiogram.enums import ParseMode
 from aiogram.types import Message, FSInputFile
 from aiogram.utils.media_group import MediaGroupBuilder
 
-from bot import bot
+from handlers import bot
 
 from keyboards.startKeyboard import start_keyboard
 
 from misc.files import get_photo_from_dir
-from misc.consts import FIRST_START_MESSAGE, SECOND_START_MESSAGE, MAIN_MENU
+from misc.consts import FIRST_START_MESSAGE, SECOND_START_MESSAGE, MAIN_MENU, GO_BACK
 
 
 router = Router()
@@ -19,6 +19,7 @@ router = Router()
 
 @router.message(Command("start"))
 @router.message(F.text == MAIN_MENU)
+@router.message(F.text == GO_BACK)
 async def start(message: Message):
     media = MediaGroupBuilder(caption=FIRST_START_MESSAGE)
 
