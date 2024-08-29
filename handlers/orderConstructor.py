@@ -145,7 +145,7 @@ async def confirm(message: Message, state: FSMContext):
                                  f"Тип помещения: {data.get('room_type')}\n"
                                  f"Класс ремонта: {data.get('repair_class')}\n"
                                  f"Номер телефона для связи: +7{data.get('phone')}\n"
-                                 f"Стоимость дизайн-проекта: {cost_calculator(data):,} руб.")
+                                 f"Стоимость дизайн-проекта: от {cost_calculator(data):,} руб.")
 
             await message.answer("Заявка принята, спасибо за обращение!\n"
                                  "Расчет стоимости ремонта в выбранном типе недвижимости "
