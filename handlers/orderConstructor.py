@@ -118,15 +118,7 @@ async def confirm(message: Message, state: FSMContext):
                                             cost=cost_calculator(data))
         #
 
-        await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Заказ_{order.id}\n"
-                                                                      f"#Клиент_{data.get('phone')}\n"
-                                                                      f"Тип недвижимости: {data.get('property_type')}\n"
-                                                                      f"Площадь помещения: {data.get('square')}\n"
-                                                                      f"Тип помещения: {data.get('room_type')}\n"
-                                                                      f"Класс ремонта: {data.get('repair_class')}\n"
-                                                                      f"Номер телефона для связи: +7{data.get('phone')}\n"
-                                                                      f"Стоимость ремонта: от {cost_calculator(data):,} руб.\n"
-                                                                      f"@{data.get('user')}")
+
 
         if data.get('property_type') == FLAT:
             await message.answer(f"Тип недвижимости: {data.get('property_type')}\n"
@@ -139,6 +131,17 @@ async def confirm(message: Message, state: FSMContext):
             await message.answer("Заявка принята, спасибо за обращение! Мы с Вами свяжемся в течение 15 минут.\n"
                                  "Если хотите оставить еще одну заявку, нажмите кнопку ниже",
                                  reply_markup=create_order_keyboard())
+
+            await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Заказ_{order.id}\n"
+                                                                          f"#Клиент_{data.get('phone')}\n"
+                                                                          f"Тип недвижимости: {data.get('property_type')}\n"
+                                                                          f"Площадь помещения: {data.get('square')}\n"
+                                                                          f"Тип помещения: {data.get('room_type')}\n"
+                                                                          f"Класс ремонта: {data.get('repair_class')}\n"
+                                                                          f"Номер телефона для связи: +7{data.get('phone')}\n"
+                                                                          f"Стоимость ремонта: {cost_calculator(data):,} руб.\n"
+                                                                          f"@{data.get('user')}")
+
         else:
             await message.answer(f"Тип недвижимости: {data.get('property_type')}\n"
                                  f"Площадь помещения: {data.get('square')}\n"
@@ -154,6 +157,17 @@ async def confirm(message: Message, state: FSMContext):
 
             await message.answer("Если хотите оставить еще одну заявку, нажмите кнопку ниже",
                                  reply_markup=create_order_keyboard())
+
+            await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Заказ_{order.id}\n"
+                                                                          f"#Клиент_{data.get('phone')}\n"
+                                                                          f"Тип недвижимости: {data.get('property_type')}\n"
+                                                                          f"Площадь помещения: {data.get('square')}\n"
+                                                                          f"Тип помещения: {data.get('room_type')}\n"
+                                                                          f"Класс ремонта: {data.get('repair_class')}\n"
+                                                                          f"Номер телефона для связи: +7{data.get('phone')}\n"
+                                                                          f"Стоимость дизайн-проекта: от {cost_calculator(data):,} руб.\n"
+                                                                          f"@{data.get('user')}")
+
         await state.clear()
     else:
         await message.answer("Ваш расчет готов! Нажмите кнопку ниже, чтобы увидеть результат\n",
