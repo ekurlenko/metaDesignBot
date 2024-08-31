@@ -23,7 +23,8 @@ async def portfolio(message: Message, state: FSMContext):
             if data.get('ind') >= len(photos) - 1:
                 await state.update_data(ind=0)
                 media = MediaGroupBuilder()
-                for file in photos[data.get('ind')]:
+                ind = int(data.get('ind') or 0)
+                for file in photos[ind]:
                     ph = FSInputFile(file)
                     media.add_photo(media=ph)
                 await bot.send_media_group(message.chat.id, media=media.build(), )
@@ -32,7 +33,8 @@ async def portfolio(message: Message, state: FSMContext):
                                      reply_markup=calculate_or_menu_keyboard())
             else:
                 media = MediaGroupBuilder()
-                for file in photos[data.get('ind')]:
+                ind = int(data.get('ind'))
+                for file in photos[ind]:
                     ph = FSInputFile(file)
                     media.add_photo(media=ph)
                 await bot.send_media_group(message.chat.id, media=media.build(), )
@@ -46,7 +48,8 @@ async def portfolio(message: Message, state: FSMContext):
             if data.get('ind') >= len(photos) - 1:
                 await state.update_data(ind=0)
             media = MediaGroupBuilder()
-            for file in photos[data.get('ind')]:
+            ind = int(data.get('ind') or 0)
+            for file in photos[ind]:
                 ph = FSInputFile(file)
                 media.add_photo(media=ph)
             await bot.send_media_group(message.chat.id, media=media.build(), )
@@ -58,7 +61,8 @@ async def portfolio(message: Message, state: FSMContext):
     except TypeError:
         await state.update_data(ind=0)
         media = MediaGroupBuilder()
-        for file in photos[data.get('ind')]:
+        ind = int(data.get('ind') or 0)
+        for file in photos[ind]:
             ph = FSInputFile(file)
             media.add_photo(media=ph)
         await bot.send_media_group(message.chat.id, media=media.build(), )
