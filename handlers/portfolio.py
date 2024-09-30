@@ -33,7 +33,7 @@ async def portfolio(message: Message, state: FSMContext):
                                      reply_markup=calculate_or_menu_keyboard())
             else:
                 media = MediaGroupBuilder()
-                ind = int(data.get('ind'))
+                ind = int(data.get('ind') or 0)
                 for file in photos[ind]:
                     ph = FSInputFile(file)
                     media.add_photo(media=ph)
