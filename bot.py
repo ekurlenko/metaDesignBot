@@ -20,10 +20,9 @@ bot = Bot(token=os.getenv('TOKEN'))
 
 
 async def main(bot: Bot):
-
     dp = Dispatcher(storage=RedisStorage.from_url(os.getenv('REDIS_URL')))
-    dp.include_routers(start.router, orderConstructor.router, repairCategories.router, moreInfo.router,
-                       designProject.router, aboutUs.router, portfolio.router)
+    dp.include_routers(start.router, orderConstructor.router, repairCategories.router,
+                       moreInfo.router, designProject.router, aboutUs.router, portfolio.router)
     await dp.start_polling(bot)
 
 
