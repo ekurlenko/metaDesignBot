@@ -3,8 +3,8 @@ import datetime
 from dataBase.config import db
 from dataBase.models.UserModel import UserModel
 from dataBase.models.RoomTypeModel import RoomTypeModel
-from dataBase.models.PropertyTypesModel import PropertyTypeModel
-from dataBase.models.RepairClassesModel import RepairClassModel
+from dataBase.models.PropertyTypeModel import PropertyTypeModel
+from dataBase.models.RepairClassModel import RepairClassModel
 
 from peewee import *
 import peewee_async
@@ -24,5 +24,3 @@ class OrderModel(peewee_async.AioModel):
         db_table = 'orders'
         database = db
 
-
-OrderModel.create_table(True)

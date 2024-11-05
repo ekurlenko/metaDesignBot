@@ -18,8 +18,8 @@ from states import OrderConfigure
 from dataBase.models.UserModel import UserModel
 from dataBase.models.OrderModel import OrderModel
 from dataBase.models.RoomTypeModel import RoomTypeModel
-from dataBase.models.PropertyTypesModel import PropertyTypeModel
-from dataBase.models.RepairClassesModel import RepairClassModel
+from dataBase.models.PropertyTypeModel import PropertyTypeModel
+from dataBase.models.RepairClassModel import RepairClassModel
 
 from handlers import bot
 
