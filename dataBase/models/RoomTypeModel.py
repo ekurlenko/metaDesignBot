@@ -15,7 +15,7 @@ class RoomTypeModel(peewee_async.AioModel):
         database = db
 
 
-RoomTypeModel.create_table(True)
+# RoomTypeModel.create_table(True)
 # RoomTypeModel.create(name=NEW_BUILDING)
 # RoomTypeModel.create(name=SECONDARY)
 

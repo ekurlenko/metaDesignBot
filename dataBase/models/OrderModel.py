@@ -18,7 +18,8 @@ class OrderModel(peewee_async.AioModel):
     room_type = ForeignKeyField(RoomTypeModel, backref="room_types")
     repair_class = ForeignKeyField(RepairClassModel, backref="repair_classes")
     cost = BigIntegerField()
-    create_date = DateField(default=datetime.date.today())
+    created_at = DateField(default=datetime.date.today())
+    done_at = DateField()
 
     class Meta:
         db_table = 'orders'

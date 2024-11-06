@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import peewee
 import os
 
@@ -115,7 +117,8 @@ async def confirm(message: Message, state: FSMContext):
                                             square=float(data.get('square')),
                                             room_type=room_type,
                                             repair_class=repair_class,
-                                            cost=cost_calculator(data))
+                                            cost=cost_calculator(data),
+                                            done_at=datetime.now())
         #
 
 

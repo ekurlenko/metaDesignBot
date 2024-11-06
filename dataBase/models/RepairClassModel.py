@@ -15,6 +15,6 @@ class RepairClassModel(peewee_async.AioModel):
         database = db
 
 
-RepairClassModel.create_table(True)
+# RepairClassModel.create_table(True)
 # RepairClassModel.create(name=COMFORT)
 # RepairClassModel.create(name=BUSINESS)

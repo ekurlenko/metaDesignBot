@@ -15,7 +15,7 @@ class PropertyTypeModel(peewee_async.AioModel):
         database = db
 
 
-PropertyTypeModel.create_table(True)
+# PropertyTypeModel.create_table(True)
 # PropertyTypeModel.create(name=FLAT)
 # PropertyTypeModel.create(name=HOUSE)
 # PropertyTypeModel.create(name=COMMERCIAL)

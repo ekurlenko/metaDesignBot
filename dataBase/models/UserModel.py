@@ -6,14 +6,14 @@ import peewee_async
 
 class UserModel(peewee_async.AioModel):
     id = BigAutoField()
-    chat_id = BigIntegerField(null=True, unique=True)
+    chat_id = BigIntegerField(null=True)
     first_name = TextField(null=True)
     last_name = TextField(null=True)
-    phone_number = TextField()
+    phone_number = CharField(unique=True, max_length=20)
 
     class Meta:
         db_table = 'users'
         database = db
 
 
-UserModel.create_table(True)
+# UserModel.create_table(True)
