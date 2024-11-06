@@ -18,8 +18,8 @@ router = Router()
 async def portfolio(message: Message, state: FSMContext):
     photos = get_photo_for_portfolio()
     data = await state.get_data()
-    media = MediaGroupBuilder()
     ind = int(data.get('ind') or 0)
+    media = MediaGroupBuilder(caption=CASES[ind])
     try:
         if message.text == NEXT:
             if ind >= len(photos) - 1:
@@ -28,14 +28,14 @@ async def portfolio(message: Message, state: FSMContext):
                     ph = FSInputFile(file)
                     media.add_photo(media=ph)
                 await bot.send_media_group(message.chat.id, media=media.build(), )
-                await message.answer(text=CASES[ind],
+                await message.answer(text="Выберите действие:",
                                      reply_markup=calculate_or_menu_keyboard())
             else:
                 for file in photos[ind]:
                     ph = FSInputFile(file)
                     media.add_photo(media=ph)
                 await bot.send_media_group(message.chat.id, media=media.build(), )
-                await message.answer(text=CASES[ind],
+                await message.answer(text="Выберите действие:",
                                      reply_markup=portfolio_keyboard())
 
                 await state.update_data(ind=ind + 1)
@@ -47,7 +47,7 @@ async def portfolio(message: Message, state: FSMContext):
                 ph = FSInputFile(file)
                 media.add_photo(media=ph)
             await bot.send_media_group(message.chat.id, media=media.build(), )
-            await message.answer(text=CASES[ind],
+            await message.answer(text="Выберите действие:",
                                  reply_markup=portfolio_keyboard())
             await state.update_data(ind=ind + 1)
     except TypeError:
@@ -57,5 +57,5 @@ async def portfolio(message: Message, state: FSMContext):
             media.add_photo(media=ph)
         await bot.send_media_group(message.chat.id, media=media.build(), )
 
-        await message.answer(text=CASES[ind],
+        await message.answer(text="Выберите действие:",
                              reply_markup=calculate_or_menu_keyboard())
