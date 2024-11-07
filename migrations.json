@@ -1,0 +1,12 @@
+{
+  "prerun": "# some code here",
+  "directory": "migrations",
+  "history": "migratehistory",
+  "models": [
+    "dataBase.models.PropertyTypeModel.PropertyTypeModel",
+    "dataBase.models.RepairClassModel.RepairClassModel",
+    "dataBase.models.RoomTypeModel.RoomTypeModel",
+    "dataBase.models.UserModel.UserModel",
+    "dataBase.models.OrderModel.OrderModel"
+  ]
+}
