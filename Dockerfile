@@ -4,6 +4,7 @@ RUN mkdir -p /metaDesignBot
 WORKDIR /metaDesignBot
 
 COPY . .
+
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 RUN export PATH="/root/.local/bin:$PATH" \
