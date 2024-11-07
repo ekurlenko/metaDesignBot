@@ -4,13 +4,13 @@ from pathlib import Path
 
 def get_photo_from_dir(directory: str) -> list[str]:
     os.chdir(str(Path.home()))
-    os.chdir("metaDesignBot/data/images/" + directory)
+    os.chdir("/metaDesignBot/data/images/" + directory)
     return sorted(os.listdir())
 
 
 def get_photo_from_dir_for_portfolio(directory: str) -> list[str]:
     os.chdir(str(Path.home()))
-    os.chdir("metaDesignBot/data/" + directory)
+    os.chdir("/metaDesignBot/data/" + directory)
     return sorted(os.listdir())
 
 
