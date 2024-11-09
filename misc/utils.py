@@ -35,12 +35,12 @@ def cost_calculator(data: Dict[str, Any]) -> int:
                 cost += 110 * 1000 * square
             elif repair_class == BUSINESS:
                 cost += 160 * 1000 * square
-        elif square < 65:
+        elif square < 35:
             if repair_class == COMFORT:
                 cost += 100 * 1000 * square
             elif repair_class == BUSINESS:
                 cost += 150 * 1000 * square
-        elif square < 95:
+        elif square < 70:
             if repair_class == COMFORT:
                 cost += 95 * 1000 * square
             elif repair_class == BUSINESS:
@@ -54,8 +54,11 @@ def cost_calculator(data: Dict[str, Any]) -> int:
             if repair_class == COMFORT:
                 cost += 85 * 1000 * square
             elif repair_class == BUSINESS:
-                cost += 150 * 1000 * square
+                cost += 115 * 1000 * square
     else:
-        cost += 4000 * square
+        if repair_class == COMFORT:
+            cost += 4000 * square
+        if repair_class == BUSINESS:
+            cost += 6000 * square
 
     return int(cost)
