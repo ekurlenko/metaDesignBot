@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Egor <ekurlenko17@gmail.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12.3"
@@ -22,4 +23,3 @@ peewee-migrations = "^0.3.32"
 [build-system]
 requires = ["poetry-core>=1.6"]
 build-backend = "poetry.core.masonry.api"
-#build-backend = "poetry.masonry.api"
