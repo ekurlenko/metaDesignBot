@@ -14,6 +14,3 @@ class UserModel(peewee_async.AioModel):
     class Meta:
         db_table = 'users'
         database = db
-
-
-# UserModel.create_table(True)
