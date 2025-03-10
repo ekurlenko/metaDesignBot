@@ -5,7 +5,7 @@ services:
     container_name: bot
     restart: always
     command:
-      sh -c "pem migrate && python3 migrate_const.py && python3 bot.py"
+      sh -c "python3 bot.py"
     volumes:
       - ./data:/metaDesignBot/data
     depends_on:
