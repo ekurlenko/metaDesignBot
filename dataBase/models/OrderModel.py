@@ -19,7 +19,7 @@ class OrderModel(peewee_async.AioModel):
     repair_class = ForeignKeyField(RepairClassModel, backref="repair_classes")
     cost = BigIntegerField()
     created_at = DateField(default=datetime.date.today())
-    done_at = DateField()
+    done_at = DateField(null=True)
 
     class Meta:
         db_table = 'orders'
