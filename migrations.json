@@ -3,10 +3,10 @@
   "directory": "migrations",
   "history": "migratehistory",
   "models": [
+    "dataBase.models.OrderModel.OrderModel",
     "dataBase.models.PropertyTypeModel.PropertyTypeModel",
     "dataBase.models.RepairClassModel.RepairClassModel",
     "dataBase.models.RoomTypeModel.RoomTypeModel",
-    "dataBase.models.UserModel.UserModel",
-    "dataBase.models.OrderModel.OrderModel"
+    "dataBase.models.UserModel.UserModel"
   ]
 }
