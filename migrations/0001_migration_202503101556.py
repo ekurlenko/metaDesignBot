@@ -51,8 +51,8 @@ class OrderModel(peewee.Model):
     room_type = snapshot.ForeignKeyField(backref='room_types', index=True, model='roomtypemodel')
     repair_class = snapshot.ForeignKeyField(backref='repair_classes', index=True, model='repairclassmodel')
     cost = BigIntegerField()
-    created_at = DateField(default=datetime.date(2024, 11, 7))
-    done_at = DateField()
+    created_at = DateField(default=datetime.date(2025, 3, 10))
+    done_at = DateField(null=True)
     class Meta:
         table_name = "orders"
 
