@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from misc.consts import COMFORT, BUSINESS, SECONDARY, FLAT
+from misc.consts import COMFORT, BUSINESS, SECONDARY, FLAT, RU_EN_DICTIONARY
 
 
 def phone_parse(x) -> str:
@@ -12,6 +12,8 @@ def phone_parse(x) -> str:
     phone = phone[-10:]
     return phone
 
+def ru_to_en_translate(ru_word: str) -> str:
+    return RU_EN_DICTIONARY.get(ru_word)
 
 def cost_calculator(data: Dict[str, Any]) -> int:
     square = data.get('square')

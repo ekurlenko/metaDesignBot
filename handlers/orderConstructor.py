@@ -27,7 +27,7 @@ from handlers import bot
 
 from misc.consts import *
 from misc.files import get_photo_from_dir
-from misc.utils import phone_parse, cost_calculator
+from misc.utils import phone_parse, cost_calculator, ru_to_en_translate
 
 router = Router()
 
@@ -108,9 +108,9 @@ async def confirm(message: Message, state: FSMContext):
         except peewee.IntegrityError:
             user = await UserModel.aio_get(UserModel.chat_id == data.get('chat_id'))
 
-        property_type = await PropertyTypeModel.aio_get(PropertyTypeModel.name == data.get('property_type'))
-        room_type = await RoomTypeModel.aio_get(RoomTypeModel.name == data.get('room_type'))
-        repair_class = await RepairClassModel.aio_get(RepairClassModel.name == data.get('repair_class'))
+        property_type = await PropertyTypeModel.aio_get(PropertyTypeModel.name == ru_to_en_translate(data.get('property_type')))
+        room_type = await RoomTypeModel.aio_get(RoomTypeModel.name == ru_to_en_translate(data.get('room_type')))
+        repair_class = await RepairClassModel.aio_get(RepairClassModel.name == ru_to_en_translate(data.get('repair_class')))
 
         order = await OrderModel.aio_create(user_id=user,
                                             property_type=property_type,

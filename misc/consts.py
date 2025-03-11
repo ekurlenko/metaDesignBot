@@ -7,6 +7,32 @@ SECONDARY = "Вторичка"
 
 BUSINESS = "Бизнес"
 COMFORT = "Комфорт"
+PREMIUM = "Премиум"
+
+RU_EN_DICTIONARY = {
+    "Коммерческое помещение": "commerce",
+    "Квартира": "flat",
+    "Дом": "house",
+
+    "Новостройка": "new",
+    "Вторичка": "secondary",
+
+    "Бизнес": "business",
+    "Комфорт": "comfort",
+    "Прем": "premium"
+}
+
+COMMERCIAL_EN = "commerce"
+FLAT_EN = "flat"
+HOUSE_EN = "house"
+
+NEW_BUILDING_EN = "new"
+SECONDARY_EN = "secondary"
+
+BUSINESS_EN = "business"
+COMFORT_EN = "comfort"
+PREMIUM_EN = "premium"
+
 
 COMMIT = "Оставить заявку"
 AGAIN = "Заполнить заново"
