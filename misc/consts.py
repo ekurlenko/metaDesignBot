@@ -19,7 +19,20 @@ RU_EN_DICTIONARY = {
 
     "Бизнес": "business",
     "Комфорт": "comfort",
-    "Прем": "premium"
+    "Премиум": "premium"
+}
+
+EN_RU_DICTIONARY = {
+    "commerce": "Коммерческое помещение",
+    "flat": "Квартира",
+    "house": "Дом",
+
+    "new": "Новостройка",
+    "secondary": "Вторичка",
+
+    "business": "Бизнес",
+    "comfort": "Комфорт",
+    "premium": "Премиум"
 }
 
 COMMERCIAL_EN = "commerce"
