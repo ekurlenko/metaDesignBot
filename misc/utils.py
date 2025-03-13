@@ -1,6 +1,18 @@
+import os
+import asyncio
+from aiogram import Bot
+from datetime import datetime
+
 from typing import Any, Dict
 
-from misc.consts import COMFORT, BUSINESS, SECONDARY, FLAT, RU_EN_DICTIONARY
+from dataBase.models.UserModel import UserModel
+from dataBase.models.OrderModel import OrderModel
+from dataBase.models.RoomTypeModel import RoomTypeModel
+from dataBase.models.PropertyTypeModel import PropertyTypeModel
+from dataBase.models.RepairClassModel import RepairClassModel
+
+
+from misc.consts import COMFORT, BUSINESS, SECONDARY, FLAT, RU_EN_DICTIONARY, EN_RU_DICTIONARY
 
 
 def phone_parse(x) -> str:
@@ -14,6 +26,9 @@ def phone_parse(x) -> str:
 
 def ru_to_en_translate(ru_word: str) -> str:
     return RU_EN_DICTIONARY.get(ru_word)
+
+def en_to_ru_translate(en_word: str) -> str:
+    return EN_RU_DICTIONARY.get(en_word)
 
 def cost_calculator(data: Dict[str, Any]) -> int:
     square = data.get('square')
@@ -64,3 +79,21 @@ def cost_calculator(data: Dict[str, Any]) -> int:
             cost += 6000 * square
 
     return int(cost)
+
+
+async def pull_orders(bot: Bot):
+    orders = await OrderModel.select().where(OrderModel.done_at == None).aio_execute()
+    for order in orders:
+        user = await UserModel.select().where(UserModel.id == order.user_id).aio_execute()
+        property_type = await PropertyTypeModel.select().where(PropertyTypeModel.id == order.property_type_id).aio_execute()
+        room_type = await RoomTypeModel.select().where(RoomTypeModel.id == order.room_type_id).aio_execute()
+        repair_class = await RepairClassModel.select().where(RepairClassModel.id == order.repair_class_id).aio_execute()
+        await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Заказ_{order.id}\n"
+                                                                          f"#Клиент_{user[0].phone_number}\n"
+                                                                          f"Тип недвижимости: {en_to_ru_translate(property_type[0].name)}\n"
+                                                                          f"Площадь помещения: {int(order.square)}\n"
+                                                                          f"Тип помещения: {en_to_ru_translate(room_type[0].name)}\n"
+                                                                          f"Класс ремонта: {en_to_ru_translate(repair_class[0].name)}\n"
+                                                                          f"Номер телефона для связи: +7{user[0].phone_number}\n"
+                                                                          f"Стоимость ремонта: от {'{0:,}'.format(order.cost).replace(',', ' ')} руб.\n")
+        order = await OrderModel.update(done_at=datetime.now()).aio_execute()
