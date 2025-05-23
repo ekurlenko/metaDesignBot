@@ -19,7 +19,14 @@ RU_EN_DICTIONARY = {
 
     "Бизнес": "business",
     "Комфорт": "comfort",
-    "Премиум": "premium"
+    "Премиум": "premium",
+    
+    "Разработка дизайн-проекта": "design_project",
+    "Ремонт под ключ": "repair",
+    "Ремонтно-строительные работы": "works",
+    "Комплектация": "equipment",
+    "Авторский надзор": "supervision",
+    "Консультация": "consulting"
 }
 
 EN_RU_DICTIONARY = {
@@ -32,7 +39,14 @@ EN_RU_DICTIONARY = {
 
     "business": "Бизнес",
     "comfort": "Комфорт",
-    "premium": "Премиум"
+    "premium": "Премиум",
+
+    "design_project": "Разработка дизайн-проекта",
+    "repair": "Ремонт под ключ",
+    "works": "Ремонтно-строительные работы",
+    "equipment": "Комплектация",
+    "supervision": "Авторский надзор",
+    "consulting": "Консультация"
 }
 
 COMMERCIAL_EN = "commerce"

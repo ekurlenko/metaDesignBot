@@ -12,7 +12,7 @@ import peewee_async
 
 class OrderModel(peewee_async.AioModel):
     id = BigAutoField()
-    user_id = ForeignKeyField(UserModel, backref="orders")
+    user_id = ForeignKeyField(UserModel, backref="users")
     property_type = ForeignKeyField(PropertyTypeModel, backref="property_types")
     square = FloatField()
     room_type = ForeignKeyField(RoomTypeModel, backref="room_types")

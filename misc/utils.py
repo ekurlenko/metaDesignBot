@@ -10,6 +10,8 @@ from dataBase.models.OrderModel import OrderModel
 from dataBase.models.RoomTypeModel import RoomTypeModel
 from dataBase.models.PropertyTypeModel import PropertyTypeModel
 from dataBase.models.RepairClassModel import RepairClassModel
+from dataBase.models.ServiceTypeModel import ServiceTypeModel
+from dataBase.models.FeedbackModel import FeedbackModel
 
 
 from misc.consts import COMFORT, BUSINESS, SECONDARY, FLAT, RU_EN_DICTIONARY, EN_RU_DICTIONARY
@@ -83,6 +85,7 @@ def cost_calculator(data: Dict[str, Any]) -> int:
 
 async def pull_orders(bot: Bot):
     orders = await OrderModel.select().where(OrderModel.done_at == None).aio_execute()
+
     for order in orders:
         user = await UserModel.select().where(UserModel.id == order.user_id).aio_execute()
         property_type = await PropertyTypeModel.select().where(PropertyTypeModel.id == order.property_type_id).aio_execute()
@@ -97,3 +100,22 @@ async def pull_orders(bot: Bot):
                                                                           f"Номер телефона для связи: +7{user[0].phone_number}\n"
                                                                           f"Стоимость ремонта: от {'{0:,}'.format(order.cost).replace(',', ' ')} руб.\n")
         order = await OrderModel.update(done_at=datetime.now()).aio_execute()
+
+
+
+
+async def pull_feedbacks(bot: Bot):
+    feedbacks = await FeedbackModel.select().where(FeedbackModel.done_at == None).aio_execute()
+    for feedback in feedbacks:
+        user = await UserModel.select().where(UserModel.id == feedback.user_id).aio_execute()
+        service_type = await ServiceTypeModel.select().where(ServiceTypeModel.id == feedback.service_type).aio_execute()
+        await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Услуга_{feedback.id}\n"
+                                                                          f"#Клиент_{user[0].phone_number}\n"
+                                                                          f"{"Имя: " + user[0].first_name + "\n" if user[0].first_name else ""}"
+                                                                          f"Тип услуги: {en_to_ru_translate(service_type[0].name)}\n"
+                                                                          f"Удобные способы связи: "
+                                                                          f"{"телеграмм, "if feedback.telegram else ''}"
+                                                                          f"{"ватсап, "if feedback.whatsapp else ''}"
+                                                                          f"{"телефонный звонок"if feedback.phone_call else ''}\n"
+                                                                          f"Номер телефона для связи: +7{user[0].phone_number}\n")
+        feedback = await FeedbackModel.update(done_at=datetime.now()).aio_execute()

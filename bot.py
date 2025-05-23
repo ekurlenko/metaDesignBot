@@ -9,7 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from handlers import orderConstructor, start, repairCategories, moreInfo, designProject, aboutUs, portfolio
 
-from misc.utils import pull_orders
+from misc.utils import pull_orders, pull_feedbacks
 
 from dotenv import load_dotenv
 
@@ -29,7 +29,8 @@ async def main(bot: Bot):
                        moreInfo.router, designProject.router, aboutUs.router, portfolio.router)
 
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(pull_orders, 'interval', minutes=30, args=[bot, ])
+    scheduler.add_job(pull_orders, 'interval', minutes=1, args=[bot, ])
+    scheduler.add_job(pull_feedbacks, 'interval', minutes=1, args=[bot, ])
     scheduler.start()
 
     await dp.start_polling(bot)
