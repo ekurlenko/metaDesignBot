@@ -11,8 +11,7 @@ db = peewee_async.PooledMySQLDatabase(
     pool_params={
         "minsize": 2,
         "maxsize": 10,
-        "pool_recycle": 55,
-        "stale_timeout": 60,
+        "pool_recycle": 55
     },
     password=os.getenv('DB_PASSWORD', default='')
 )
