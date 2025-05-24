@@ -13,7 +13,6 @@ from dataBase.models.RepairClassModel import RepairClassModel
 from dataBase.models.ServiceTypeModel import ServiceTypeModel
 from dataBase.models.FeedbackModel import FeedbackModel
 
-from dataBase.config import db
 
 
 from misc.consts import COMFORT, BUSINESS, SECONDARY, FLAT, RU_EN_DICTIONARY, EN_RU_DICTIONARY
@@ -86,19 +85,14 @@ def cost_calculator(data: Dict[str, Any]) -> int:
 
 
 async def pull_orders(bot: Bot):
-    db.close()
     orders = await OrderModel.select().where(OrderModel.done_at == None).aio_execute()
-    db.close()
 
     for order in orders:
-        db.connect()
         user = await UserModel.select().where(UserModel.id == order.user_id).aio_execute()
         property_type = await PropertyTypeModel.select().where(PropertyTypeModel.id == order.property_type_id).aio_execute()
-        db.close()
-        db.connect()
         room_type = await RoomTypeModel.select().where(RoomTypeModel.id == order.room_type_id).aio_execute()
         repair_class = await RepairClassModel.select().where(RepairClassModel.id == order.repair_class_id).aio_execute()
-        db.close()
+
         await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Заказ_{order.id}\n"
                                                                           f"#Клиент_{user[0].phone_number}\n"
                                                                           f"Тип недвижимости: {en_to_ru_translate(property_type[0].name)}\n"
@@ -107,21 +101,17 @@ async def pull_orders(bot: Bot):
                                                                           f"Класс ремонта: {en_to_ru_translate(repair_class[0].name)}\n"
                                                                           f"Номер телефона для связи: +7{user[0].phone_number}\n"
                                                                           f"Стоимость ремонта: от {'{0:,}'.format(order.cost).replace(',', ' ')} руб.\n")
-        db.connect()
-        order = await OrderModel.update(done_at=datetime.now()).aio_execute()
-        db.close()
 
+        order = await OrderModel.update(done_at=datetime.now()).aio_execute()
 
 
 async def pull_feedbacks(bot: Bot):
-    db.connect()
     feedbacks = await FeedbackModel.select().where(FeedbackModel.done_at == None).aio_execute()
-    db.close()
+
     for feedback in feedbacks:
-        db.connect()
         user = await UserModel.select().where(UserModel.id == feedback.user_id).aio_execute()
         service_type = await ServiceTypeModel.select().where(ServiceTypeModel.id == feedback.service_type).aio_execute()
-        db.close()
+
         await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Услуга_{feedback.id}\n"
                                                                           f"#Клиент_{user[0].phone_number}\n"
                                                                           f"{"Имя: " + user[0].first_name + "\n" if user[0].first_name else ""}"
@@ -131,6 +121,5 @@ async def pull_feedbacks(bot: Bot):
                                                                           f"{"ватсап, "if feedback.whatsapp else ''}"
                                                                           f"{"телефонный звонок"if feedback.phone_call else ''}\n"
                                                                           f"Номер телефона для связи: +7{user[0].phone_number}\n")
-        db.connect()
+
         feedback = await FeedbackModel.update(done_at=datetime.now()).aio_execute()
-        db.close()
