@@ -19,5 +19,5 @@ class FeedbackModel(peewee_async.AioModel):
     done_at = DateField(null=True)
 
     class Meta:
-        database = db
         table_name = 'feedback'
+        database = db

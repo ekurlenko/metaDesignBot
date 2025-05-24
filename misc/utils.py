@@ -1,5 +1,5 @@
 import os
-import asyncio
+import peewee_async
 from aiogram import Bot
 from datetime import datetime
 
