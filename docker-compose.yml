@@ -9,8 +9,6 @@ services:
     volumes:
       - ./data:/metaDesignBot/data
     depends_on:
-      mysql:
-        condition: service_healthy
       redis:
         condition: service_healthy
     env_file:
@@ -54,19 +52,6 @@ services:
     restart: unless-stopped
     tty: true
     stdin_open: true
-
-  mysql:
-    image: mysql:8
-    container_name: mysql
-    restart: always
-    ports:
-      - "3306:3306"
-    env_file:
-      - ".env"
-    healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
-      timeout: 2s
-      retries: 10
 
 networks:
    default:
