@@ -5,6 +5,7 @@ from datetime import datetime
 
 from typing import Any, Dict
 
+from dataBase.config import db
 from dataBase.models.UserModel import UserModel
 from dataBase.models.OrderModel import OrderModel
 from dataBase.models.RoomTypeModel import RoomTypeModel
@@ -85,6 +86,7 @@ def cost_calculator(data: Dict[str, Any]) -> int:
 
 
 async def pull_orders(bot: Bot):
+    db.connect()
     orders = await OrderModel.select().where(OrderModel.done_at == None).aio_execute()
 
     for order in orders:
@@ -106,6 +108,7 @@ async def pull_orders(bot: Bot):
 
 
 async def pull_feedbacks(bot: Bot):
+    db.connect()
     feedbacks = await FeedbackModel.select().where(FeedbackModel.done_at == None).aio_execute()
 
     for feedback in feedbacks:
