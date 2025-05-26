@@ -1,4 +1,6 @@
 import os
+
+import peewee
 import peewee_async
 from aiogram import Bot
 from datetime import datetime
@@ -86,7 +88,12 @@ def cost_calculator(data: Dict[str, Any]) -> int:
 
 
 async def pull_orders(bot: Bot):
-    db.connect()
+    try:
+        db.connect()
+    except peewee.OperationalError:
+        db.close()
+        db.connect()
+
     orders = await OrderModel.select().where(OrderModel.done_at == None).aio_execute()
 
     for order in orders:
@@ -108,7 +115,12 @@ async def pull_orders(bot: Bot):
 
 
 async def pull_feedbacks(bot: Bot):
-    db.connect()
+    try:
+        db.connect()
+    except peewee.OperationalError:
+        db.close()
+        db.connect()
+
     feedbacks = await FeedbackModel.select().where(FeedbackModel.done_at == None).aio_execute()
 
     for feedback in feedbacks:
