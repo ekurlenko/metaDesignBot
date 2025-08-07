@@ -27,6 +27,8 @@ async def portfolio(message: Message, state: FSMContext):
                 for file in photos[ind]:
                     ph = FSInputFile(file)
                     media.add_photo(media=ph)
+
+                await bot.send_chat_action(message.chat.id, action="upload_photo", request_timeout=8)
                 await bot.send_media_group(message.chat.id, media=media.build(), )
                 await message.answer(text="Выберите действие:",
                                      reply_markup=calculate_or_menu_keyboard())
@@ -34,6 +36,8 @@ async def portfolio(message: Message, state: FSMContext):
                 for file in photos[ind]:
                     ph = FSInputFile(file)
                     media.add_photo(media=ph)
+
+                await bot.send_chat_action(message.chat.id, action="upload_photo", request_timeout=8)
                 await bot.send_media_group(message.chat.id, media=media.build(), )
                 await message.answer(text="Выберите действие:",
                                      reply_markup=portfolio_keyboard())
@@ -46,6 +50,8 @@ async def portfolio(message: Message, state: FSMContext):
             for file in photos[ind]:
                 ph = FSInputFile(file)
                 media.add_photo(media=ph)
+
+            await bot.send_chat_action(message.chat.id, action="upload_photo", request_timeout=8)
             await bot.send_media_group(message.chat.id, media=media.build(), )
             await message.answer(text="Выберите действие:",
                                  reply_markup=portfolio_keyboard())
@@ -55,6 +61,8 @@ async def portfolio(message: Message, state: FSMContext):
         for file in photos[ind]:
             ph = FSInputFile(file)
             media.add_photo(media=ph)
+
+        await bot.send_chat_action(message.chat.id, action="upload_photo", request_timeout=8)
         await bot.send_media_group(message.chat.id, media=media.build(), )
 
         await message.answer(text="Выберите действие:",

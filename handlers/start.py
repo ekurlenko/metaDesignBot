@@ -1,4 +1,5 @@
 import os
+import time
 
 from aiogram import Router, F
 from aiogram.filters import Command
@@ -27,6 +28,8 @@ async def start(message: Message):
         ph = FSInputFile(os.path.abspath(file))
         media.add_photo(media=ph)
 
+    await bot.send_chat_action(message.chat.id, action="upload_photo")
+    time.sleep(2)
     await bot.send_media_group(message.chat.id, media=media.build(), )
 
     await message.answer(text=SECOND_START_MESSAGE,

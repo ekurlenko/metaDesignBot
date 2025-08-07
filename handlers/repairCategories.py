@@ -23,6 +23,7 @@ async def about_repair_categories(message: Message):
         ph = FSInputFile(os.path.abspath(file))
         media.add_photo(media=ph)
 
+    await bot.send_chat_action(message.chat.id, action="typing", request_timeout=7)
     await bot.send_media_group(message.chat.id, media=media.build(), )
 
     await message.answer(text=SECOND_ABOUT_CATEGORIES,
