@@ -10,9 +10,9 @@ from typing import Any, Dict
 from dataBase.config import db
 from dataBase.models.UserModel import UserModel
 from dataBase.models.OrderModel import OrderModel
-from dataBase.models.RoomTypeModel import RoomTypeModel
-from dataBase.models.PropertyTypeModel import PropertyTypeModel
-from dataBase.models.RepairClassModel import RepairClassModel
+from dataBase.models.RealtyStatusTypeModel import RealtyStatusTypeModel
+from dataBase.models.RealtyTypeModel import RealtyTypeModel
+from dataBase.models.RepairTypeModel import RepairTypeModel
 from dataBase.models.ServiceTypeModel import ServiceTypeModel
 from dataBase.models.FeedbackModel import FeedbackModel
 
@@ -38,69 +38,64 @@ def en_to_ru_translate(en_word: str) -> str:
 
 def cost_calculator(data: Dict[str, Any]) -> int:
     square = data.get('square')
-    property_type = data.get('property_type')
-    repair_class = data.get('repair_class')
-    room_type = data.get('room_type')
+    realty_type = data.get('realty_type')
+    repair_type = data.get('repair_type')
+    realty_status_type = data.get('realty_status_type')
 
     cost = 0
-    if property_type == FLAT:
+    if realty_type == FLAT:
 
-        if room_type == SECONDARY:
+        if realty_status_type == SECONDARY:
             cost += 150 * 1000
 
         if square < 25:
-            if repair_class == COMFORT:
+            if repair_type == COMFORT:
                 cost += 120 * 1000 * square
-            elif repair_class == BUSINESS:
+            elif repair_type == BUSINESS:
                 cost += 170 * 1000 * square
         elif square < 30:
-            if repair_class == COMFORT:
+            if repair_type == COMFORT:
                 cost += 110 * 1000 * square
-            elif repair_class == BUSINESS:
+            elif repair_type == BUSINESS:
                 cost += 160 * 1000 * square
         elif square < 35:
-            if repair_class == COMFORT:
+            if repair_type == COMFORT:
                 cost += 100 * 1000 * square
-            elif repair_class == BUSINESS:
+            elif repair_type == BUSINESS:
                 cost += 150 * 1000 * square
         elif square < 70:
-            if repair_class == COMFORT:
+            if repair_type == COMFORT:
                 cost += 95 * 1000 * square
-            elif repair_class == BUSINESS:
+            elif repair_type == BUSINESS:
                 cost += 130 * 1000 * square
         elif square < 100:
-            if repair_class == COMFORT:
+            if repair_type == COMFORT:
                 cost += 90 * 1000 * square
-            elif repair_class == BUSINESS:
+            elif repair_type == BUSINESS:
                 cost += 120 * 1000 * square
         else:
-            if repair_class == COMFORT:
+            if repair_type == COMFORT:
                 cost += 85 * 1000 * square
-            elif repair_class == BUSINESS:
+            elif repair_type == BUSINESS:
                 cost += 115 * 1000 * square
     else:
-        if repair_class == COMFORT:
+        if repair_type == COMFORT:
             cost += 4000 * square
-        if repair_class == BUSINESS:
+        if repair_type == BUSINESS:
             cost += 6000 * square
 
     return int(cost)
 
 
 async def pull_orders(bot: Bot):
-    try:
-        db.connect()
-    except peewee.OperationalError:
-        db.close()
-        db.connect()
 
     orders = await OrderModel.select().where(OrderModel.done_at == None).aio_execute()
 
     for order in orders:
         user = await UserModel.select().where(UserModel.id == order.user_id).aio_execute()
-        property_type = await PropertyTypeModel.select().where(PropertyTypeModel.id == order.property_type_id).aio_execute()
-        room_type = await RoomTypeModel.select().where(RoomTypeModel.id == order.room_type_id).aio_execute()
-        repair_class = await RepairClassModel.select().where(RepairClassModel.id == order.repair_class_id).aio_execute()
+        property_type = await RealtyTypeModel.select().where(RealtyTypeModel.id == order.property_type_id).aio_execute()
+        room_type = await RealtyStatusTypeModel.select().where(RealtyStatusTypeModel.id == order.room_type_id).aio_execute()
+        repair_class = await RepairTypeModel.select().where(RepairTypeModel.id == order.repair_class_id).aio_execute()
 
         await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Заказ_{order.id}\n"
                                                                           f"#Клиент_{user[0].phone_number}\n"
