@@ -1,9 +1,9 @@
 from peewee import *
-import peewee_async
 
 from dataBase.config import db
 
-class ServiceTypeModel(peewee_async.AioModel):
+
+class ServiceTypeModel(Model):
     id = BigAutoField(primary_key=True)
     name = CharField(unique=True, max_length=100)
 

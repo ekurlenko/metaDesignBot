@@ -1,14 +1,13 @@
 import datetime
 
-import peewee_async
 from peewee import *
 
 from dataBase.config import db
-from dataBase.models.UserModel import UserModel
 from dataBase.models.ServiceTypeModel import ServiceTypeModel
+from dataBase.models.UserModel import UserModel
 
 
-class FeedbackModel(peewee_async.AioModel):
+class FeedbackModel(Model):
     id = BigAutoField()
     user_id = ForeignKeyField(UserModel, backref='users')
     service_type = ForeignKeyField(ServiceTypeModel, backref='service_type')
