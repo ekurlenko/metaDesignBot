@@ -1,33 +1,27 @@
-from datetime import datetime
-
-import peewee
 import os
 
+import peewee
 from aiogram import Router, F
-from aiogram.types import Message, FSInputFile
 from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message, FSInputFile
 from aiogram.utils.media_group import MediaGroupBuilder
 
-from keyboards.phoneKeyboard import get_phone_keyboard
-from keyboards.roomTypeKeyboard import room_type_keyboard
-from keyboards.repairClassKeyboard import repair_class_keyboard
-from keyboards.createOrderKeyboard import create_order_keyboard
-from keyboards.propertyTypeKeyboard import type_of_property_keyboard
-
-from states import OrderConfigure
-
-from dataBase.models.UserModel import UserModel
-from dataBase.models.OrderModel import OrderModel
-from dataBase.models.RoomTypeModel import RoomTypeModel
-from dataBase.models.PropertyTypeModel import PropertyTypeModel
-from dataBase.models.RepairClassModel import RepairClassModel
-
+from dataBase.repositories.order import OrderRepository
+from dataBase.repositories.realty_type import RealtyTypeRepository
+from dataBase.repositories.realty_type_status import RealtyStatusTypeRepository
+from dataBase.repositories.repair_type import RepairTypeRepository
+from dataBase.repositories.user import UserRepository
 from handlers import bot
-
+from keyboards.createOrderKeyboard import create_order_keyboard
+from keyboards.phoneKeyboard import get_phone_keyboard
+from keyboards.propertyTypeKeyboard import type_of_property_keyboard
+from keyboards.repairClassKeyboard import repair_class_keyboard
+from keyboards.roomTypeKeyboard import room_type_keyboard
 from misc.consts import *
 from misc.files import get_photo_from_dir
 from misc.utils import phone_parse, cost_calculator, ru_to_en_translate
+from states import OrderConfigure
 
 router = Router()
 
@@ -42,10 +36,10 @@ async def start(message: Message, state: FSMContext):
 
 @router.message(OrderConfigure.square)
 async def square(message: Message, state: FSMContext):
-    await state.update_data(name=message.chat.first_name,
+    await state.update_data(first_name=message.chat.first_name,
                             chat_id=message.chat.id,
-                            property_type=message.text,
-                            user=message.from_user.username)
+                            realty_type=message.text,
+                            username=message.from_user.username)
     await message.answer("Укажите площадь вашего объекта")
     await state.set_state(OrderConfigure.room_type)
 
@@ -67,7 +61,7 @@ async def room_type(message: Message, state: FSMContext):
 
 @router.message(OrderConfigure.repair_class)
 async def repair_class(message: Message, state: FSMContext):
-    await state.update_data(room_type=message.text)
+    await state.update_data(realty_status_type=message.text)
     await message.answer("Какая категория ремонта вам ближе?",
                          reply_markup=repair_class_keyboard())
     await state.set_state(OrderConfigure.phone)
@@ -90,7 +84,7 @@ async def phone(message: Message, state: FSMContext):
                              reply_markup=repair_class_keyboard())
         await state.set_state(OrderConfigure.phone)
     else:
-        await state.update_data(repair_class=message.text)
+        await state.update_data(repair_type=message.text)
         await message.answer("Ваш расчет готов! Нажмите на кнопку ниже, чтобы увидеть результат\n",
                              reply_markup=get_phone_keyboard())
         await state.set_state(OrderConfigure.confirm)
@@ -102,32 +96,47 @@ async def confirm(message: Message, state: FSMContext):
         await state.update_data(phone=phone_parse(message.contact.phone_number))
         data = await state.get_data()
         try:
-            user = await UserModel.aio_create(chat_id=data.get('chat_id'),
-                                              first_name=data.get('name'),
-                                              phone_number=data.get('phone'))
+            with UserRepository() as user_repo:
+                user = user_repo.create(data=data)
         except peewee.IntegrityError:
-            user = await UserModel.aio_get(UserModel.chat_id == data.get('chat_id'))
+            with UserRepository() as user_repo:
+                user = user_repo.get_by_chat_id(data.get('chat_id'))
 
-        property_type = await PropertyTypeModel.aio_get(PropertyTypeModel.name == ru_to_en_translate(data.get('property_type')))
-        room_type = await RoomTypeModel.aio_get(RoomTypeModel.name == ru_to_en_translate(data.get('room_type')))
-        repair_class = await RepairClassModel.aio_get(RepairClassModel.name == ru_to_en_translate(data.get('repair_class')))
+        name = ru_to_en_translate(data.get('realty_type'))
+        with RealtyTypeRepository() as realty_type_repo:
+            realty_type = realty_type_repo.find_by_name(name=name)
 
-        order = await OrderModel.aio_create(user_id=user,
-                                            property_type=property_type,
-                                            square=float(data.get('square')),
-                                            room_type=room_type,
-                                            repair_class=repair_class,
-                                            cost=cost_calculator(data),
-                                            done_at=datetime.now())
+        name = ru_to_en_translate(data.get('realty_status_type'))
+        with RealtyStatusTypeRepository() as realty_status_type_repo:
+            realty_status_type = realty_status_type_repo.find_by_name(name=name)
+
+        name = ru_to_en_translate(data.get('repair_type'))
+        with RepairTypeRepository() as repair_type_repo:
+            repair_type = repair_type_repo.find_by_name(name=name)
+
+        order_data = {
+            'user_id': user,
+            'realty_type_id': realty_type,
+            'realty_status_type_id': realty_status_type,
+            'repair_type_id': repair_type,
+            'square': float(data.get('square')),
+            'cost': cost_calculator(data)
+        }
+        with OrderRepository() as order_repo:
+            order = order_repo.create(order_data)
+
+
         #
 
 
 
-        if data.get('property_type') == FLAT:
-            await message.answer(f"Тип недвижимости: {data.get('property_type')}\n"
+
+
+        if data.get('realty_type') == FLAT:
+            await message.answer(f"Тип недвижимости: {data.get('realty_type')}\n"
                                  f"Площадь помещения: {data.get('square')}\n"
-                                 f"Тип помещения: {data.get('room_type')}\n"
-                                 f"Класс ремонта: {data.get('repair_class')}\n"
+                                 f"Тип помещения: {data.get('realty_status_type')}\n"
+                                 f"Класс ремонта: {data.get('repair_type')}\n"
                                  f"Номер телефона для связи: +7{data.get('phone')}\n"
                                  f"Стоимость ремонта: от {'{0:,}'.format(cost_calculator(data)).replace(',', ' ')} руб.")
 
@@ -137,19 +146,19 @@ async def confirm(message: Message, state: FSMContext):
 
             await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Заказ_{order.id}\n"
                                                                           f"#Клиент_{data.get('phone')}\n"
-                                                                          f"Тип недвижимости: {data.get('property_type')}\n"
+                                                                          f"Тип недвижимости: {data.get('realty_type')}\n"
                                                                           f"Площадь помещения: {data.get('square')}\n"
-                                                                          f"Тип помещения: {data.get('room_type')}\n"
-                                                                          f"Класс ремонта: {data.get('repair_class')}\n"
+                                                                          f"Тип помещения: {data.get('realty_status_type')}\n"
+                                                                          f"Класс ремонта: {data.get('repair_type')}\n"
                                                                           f"Номер телефона для связи: +7{data.get('phone')}\n"
                                                                           f"Стоимость ремонта: от {'{0:,}'.format(cost_calculator(data)).replace(',', ' ')} руб.\n"
                                                                           f"@{data.get('user')}")
 
         else:
-            await message.answer(f"Тип недвижимости: {data.get('property_type')}\n"
+            await message.answer(f"Тип недвижимости: {data.get('realty_type')}\n"
                                  f"Площадь помещения: {data.get('square')}\n"
-                                 f"Тип помещения: {data.get('room_type')}\n"
-                                 f"Класс ремонта: {data.get('repair_class')}\n"
+                                 f"Тип помещения: {data.get('realty_status_type')}\n"
+                                 f"Класс ремонта: {data.get('repair_type')}\n"
                                  f"Номер телефона для связи: +7{data.get('phone')}\n"
                                  f"Стоимость дизайн-проекта: от {'{0:,}'.format(cost_calculator(data)).replace(',', ' ')} руб.")
 
@@ -163,10 +172,10 @@ async def confirm(message: Message, state: FSMContext):
 
             await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Заказ_{order.id}\n"
                                                                           f"#Клиент_{data.get('phone')}\n"
-                                                                          f"Тип недвижимости: {data.get('property_type')}\n"
+                                                                          f"Тип недвижимости: {data.get('realty_type')}\n"
                                                                           f"Площадь помещения: {data.get('square')}\n"
-                                                                          f"Тип помещения: {data.get('room_type')}\n"
-                                                                          f"Класс ремонта: {data.get('repair_class')}\n"
+                                                                          f"Тип помещения: {data.get('realty_status_type')}\n"
+                                                                          f"Класс ремонта: {data.get('repair_type')}\n"
                                                                           f"Номер телефона для связи: +7{data.get('phone')}\n"
                                                                           f"Стоимость дизайн-проекта: от {'{0:,}'.format(cost_calculator(data)).replace(',', ' ')} руб.\n"
                                                                           f"@{data.get('user')}")
