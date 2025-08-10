@@ -1,23 +1,10 @@
 import os
-
-import peewee
-import peewee_async
-from aiogram import Bot
-from datetime import datetime
-
 from typing import Any, Dict
 
-from dataBase.config import db
-from dataBase.models.UserModel import UserModel
-from dataBase.models.OrderModel import OrderModel
-from dataBase.models.RealtyStatusTypeModel import RealtyStatusTypeModel
-from dataBase.models.RealtyTypeModel import RealtyTypeModel
-from dataBase.models.RepairTypeModel import RepairTypeModel
-from dataBase.models.ServiceTypeModel import ServiceTypeModel
-from dataBase.models.FeedbackModel import FeedbackModel
+from aiogram import Bot
 
-
-
+from dataBase.repositories.feedback import FeedbackRepository
+from dataBase.repositories.order import OrderRepository
 from misc.consts import COMFORT, BUSINESS, SECONDARY, FLAT, RU_EN_DICTIONARY, EN_RU_DICTIONARY
 
 
@@ -30,11 +17,14 @@ def phone_parse(x) -> str:
     phone = phone[-10:]
     return phone
 
+
 def ru_to_en_translate(ru_word: str) -> str:
     return RU_EN_DICTIONARY.get(ru_word)
 
+
 def en_to_ru_translate(en_word: str) -> str:
     return EN_RU_DICTIONARY.get(en_word)
+
 
 def cost_calculator(data: Dict[str, Any]) -> int:
     square = data.get('square')
@@ -88,48 +78,45 @@ def cost_calculator(data: Dict[str, Any]) -> int:
 
 
 async def pull_orders(bot: Bot):
-
-    orders = await OrderModel.select().where(OrderModel.done_at == None).aio_execute()
+    with OrderRepository() as order_repo:
+        orders = order_repo.get_not_done()
 
     for order in orders:
-        user = await UserModel.select().where(UserModel.id == order.user_id).aio_execute()
-        property_type = await RealtyTypeModel.select().where(RealtyTypeModel.id == order.property_type_id).aio_execute()
-        room_type = await RealtyStatusTypeModel.select().where(RealtyStatusTypeModel.id == order.room_type_id).aio_execute()
-        repair_class = await RepairTypeModel.select().where(RepairTypeModel.id == order.repair_class_id).aio_execute()
+        user = order.user_id
+        realty_type = order.realty_type
+        realty_status_type = order.realty_status_type
+        repair_type = order.repair_type
 
         await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Заказ_{order.id}\n"
-                                                                          f"#Клиент_{user[0].phone_number}\n"
-                                                                          f"Тип недвижимости: {en_to_ru_translate(property_type[0].name)}\n"
-                                                                          f"Площадь помещения: {int(order.square)}\n"
-                                                                          f"Тип помещения: {en_to_ru_translate(room_type[0].name)}\n"
-                                                                          f"Класс ремонта: {en_to_ru_translate(repair_class[0].name)}\n"
-                                                                          f"Номер телефона для связи: +7{user[0].phone_number}\n"
-                                                                          f"Стоимость ремонта: от {'{0:,}'.format(order.cost).replace(',', ' ')} руб.\n")
+                                                                      f"#Клиент_{user.phone_number}\n"
+                                                                      f"Тип недвижимости: {en_to_ru_translate(realty_type.name)}\n"
+                                                                      f"Площадь помещения: {int(order.square)}\n"
+                                                                      f"Тип помещения: {en_to_ru_translate(realty_status_type.name)}\n"
+                                                                      f"Класс ремонта: {en_to_ru_translate(repair_type.name)}\n"
+                                                                      f"Номер телефона для связи: +7{user.phone_number}\n"
+                                                                      f"Стоимость ремонта: от {'{0:,}'.format(order.cost).replace(',', ' ')} руб.\n")
 
-        order = await OrderModel.update(done_at=datetime.now()).aio_execute()
+        with OrderRepository() as order_repo:
+            order_repo.update_done_at(order)
 
 
 async def pull_feedbacks(bot: Bot):
-    try:
-        db.connect()
-    except peewee.OperationalError:
-        db.close()
-        db.connect()
-
-    feedbacks = await FeedbackModel.select().where(FeedbackModel.done_at == None).aio_execute()
+    with FeedbackRepository() as feedback_repo:
+        feedbacks = feedback_repo.get_not_done()
 
     for feedback in feedbacks:
-        user = await UserModel.select().where(UserModel.id == feedback.user_id).aio_execute()
-        service_type = await ServiceTypeModel.select().where(ServiceTypeModel.id == feedback.service_type).aio_execute()
+        user = feedback.user_id
+        service_type = feedback.service_type
 
         await bot.send_message(chat_id=os.getenv('TARGET_CHAT'), text=f"#Услуга_{feedback.id}\n"
-                                                                          f"#Клиент_{user[0].phone_number}\n"
-                                                                          f"{"Имя: " + user[0].first_name + "\n" if user[0].first_name else ""}"
-                                                                          f"Тип услуги: {en_to_ru_translate(service_type[0].name)}\n"
-                                                                          f"Удобные способы связи: "
-                                                                          f"{"телеграмм, "if feedback.telegram else ''}"
-                                                                          f"{"ватсап, "if feedback.whatsapp else ''}"
-                                                                          f"{"телефонный звонок"if feedback.phone_call else ''}\n"
-                                                                          f"Номер телефона для связи: +7{user[0].phone_number}\n")
+                                                                      f"#Клиент_{user.phone_number}\n"
+                                                                      f"{"Имя: " + user.first_name + "\n" if user.first_name else ""}"
+                                                                      f"Тип услуги: {en_to_ru_translate(service_type.name)}\n"
+                                                                      f"Удобные способы связи: "
+                                                                      f"{"телеграмм, " if feedback.telegram else ''}"
+                                                                      f"{"ватсап, " if feedback.whatsapp else ''}"
+                                                                      f"{"телефонный звонок" if feedback.phone_call else ''}\n"
+                                                                      f"Номер телефона для связи: +7{user.phone_number}\n")
 
-        feedback = await FeedbackModel.update(done_at=datetime.now()).aio_execute()
+        with FeedbackRepository() as feedback_repo:
+            feedback_repo.update_done_at(feedback)
