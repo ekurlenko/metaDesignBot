@@ -100,7 +100,10 @@ async def confirm(message: Message, state: FSMContext):
                 user = user_repo.create(data=data)
         except peewee.IntegrityError:
             with UserRepository() as user_repo:
-                user = user_repo.get_by_chat_id(data.get('chat_id'))
+                user = user_repo.get_by_phone(data['phone'])
+                if not user.chat_id:
+                    user_repo.update_chat_id(user, data['chat_id'])
+
 
         name = ru_to_en_translate(data.get('realty_type'))
         with RealtyTypeRepository() as realty_type_repo:
