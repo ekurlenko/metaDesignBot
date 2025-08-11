@@ -1,22 +1,21 @@
 import datetime
 
-from dataBase.config import db
-from dataBase.models.UserModel import UserModel
-from dataBase.models.RoomTypeModel import RoomTypeModel
-from dataBase.models.PropertyTypeModel import PropertyTypeModel
-from dataBase.models.RepairClassModel import RepairClassModel
-
 from peewee import *
-import peewee_async
+
+from dataBase.config import db
+from dataBase.models.RealtyStatusTypeModel import RealtyStatusTypeModel
+from dataBase.models.RealtyTypeModel import RealtyTypeModel
+from dataBase.models.RepairTypeModel import RepairTypeModel
+from dataBase.models.UserModel import UserModel
 
 
-class OrderModel(peewee_async.AioModel):
+class OrderModel(Model):
     id = BigAutoField()
     user_id = ForeignKeyField(UserModel, backref="users")
-    property_type = ForeignKeyField(PropertyTypeModel, backref="property_types")
+    realty_type = ForeignKeyField(RealtyTypeModel, backref="realty_types")
     square = FloatField()
-    room_type = ForeignKeyField(RoomTypeModel, backref="room_types")
-    repair_class = ForeignKeyField(RepairClassModel, backref="repair_classes")
+    realty_status_type = ForeignKeyField(RealtyStatusTypeModel, backref="realty_status_types")
+    repair_type = ForeignKeyField(RepairTypeModel, backref="repair_types")
     cost = BigIntegerField()
     created_at = DateField(default=datetime.date.today())
     done_at = DateField(null=True)
@@ -24,4 +23,3 @@ class OrderModel(peewee_async.AioModel):
     class Meta:
         db_table = 'orders'
         database = db
-

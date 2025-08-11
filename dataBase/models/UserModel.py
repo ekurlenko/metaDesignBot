@@ -1,10 +1,9 @@
+from peewee import Model, BigAutoField, BigIntegerField, TextField, CharField
+
 from dataBase.config import db
 
-from peewee import *
-import peewee_async
 
-
-class UserModel(peewee_async.AioModel):
+class UserModel(Model):
     id = BigAutoField()
     chat_id = BigIntegerField(null=True)
     first_name = TextField(null=True)
