@@ -155,7 +155,7 @@ async def confirm(message: Message, state: FSMContext):
                                                                           f"Класс ремонта: {data.get('repair_type')}\n"
                                                                           f"Номер телефона для связи: +7{data.get('phone')}\n"
                                                                           f"Стоимость ремонта: от {'{0:,}'.format(cost_calculator(data)).replace(',', ' ')} руб.\n"
-                                                                          f"@{data.get('user')}")
+                                                                          f"@{data.get('username')}")
 
         else:
             await message.answer(f"Тип недвижимости: {data.get('realty_type')}\n"
@@ -181,7 +181,7 @@ async def confirm(message: Message, state: FSMContext):
                                                                           f"Класс ремонта: {data.get('repair_type')}\n"
                                                                           f"Номер телефона для связи: +7{data.get('phone')}\n"
                                                                           f"Стоимость дизайн-проекта: от {'{0:,}'.format(cost_calculator(data)).replace(',', ' ')} руб.\n"
-                                                                          f"@{data.get('user')}")
+                                                                          f"@{data.get('username')}")
 
         await state.clear()
     else:
